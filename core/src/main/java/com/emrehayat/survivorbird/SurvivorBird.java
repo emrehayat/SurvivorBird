@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Preferences;
 
 import java.util.Random;
 
@@ -31,6 +32,7 @@ public class SurvivorBird extends ApplicationAdapter {
 
     // Düşman kuş animasyonu
     Texture[] enemyBirds;
+    Texture[] redEnemyBirds;
     int enemyFlapState = 0;
     float enemyFlapTime = 0;
 
@@ -51,6 +53,9 @@ public class SurvivorBird extends ApplicationAdapter {
     Circle birdCircle;
 
     ShapeRenderer shapeRenderer;
+
+    int highScore = 0;
+    Preferences preferences;
 
     int numberOfEnemies = 4;
     float [] enemyX = new float[numberOfEnemies];
@@ -77,6 +82,11 @@ public class SurvivorBird extends ApplicationAdapter {
         enemyBirds = new Texture[2];
         enemyBirds[0] = new Texture("enemy1.png");
         enemyBirds[1] = new Texture("enemy2.png");
+
+        // Diğer düşman kuş resimleri
+        redEnemyBirds = new Texture[2];
+        redEnemyBirds[0] = new Texture("redenemy1.png");
+        redEnemyBirds[1] = new Texture("redenemy2.png");
 
         distance = Gdx.graphics.getWidth() / 2;
         random = new Random();
@@ -110,6 +120,9 @@ public class SurvivorBird extends ApplicationAdapter {
             enemyCircles2[i] = new Circle();
             enemyCircles3[i] = new Circle();
         }
+
+        preferences = Gdx.app.getPreferences("SurvivorBirdHighScore");
+        highScore = preferences.getInteger("highScore", 0); // varsayılan 0
     }
 
     @Override
@@ -144,10 +157,26 @@ public class SurvivorBird extends ApplicationAdapter {
                 } else {
                     scoredEnemy = 0;
                 }
+
+                // Rekor güncelleme kontrolü
+                if (score > highScore) {
+                    highScore = score;
+                    preferences.putInteger("highScore", highScore);
+                    preferences.flush(); // kalıcı olarak kaydeder
+                }
+
             }
 
             if (Gdx.input.justTouched()) {
                 velocity = -7;
+            }
+
+            // Düşman Değişimi
+            Texture[] currentEnemyBirds;
+            if (score < 20) {
+                currentEnemyBirds = enemyBirds;
+            } else {
+                currentEnemyBirds = redEnemyBirds;
             }
 
             for (int i = 0; i < numberOfEnemies; i++) {
@@ -162,11 +191,11 @@ public class SurvivorBird extends ApplicationAdapter {
                 }
 
                 // Düşman kuşların animasyonlu çizimi
-                batch.draw(enemyBirds[enemyFlapState], enemyX[i], Gdx.graphics.getHeight() / 2 + enemyOffset[i],
+                batch.draw(currentEnemyBirds[enemyFlapState], enemyX[i], Gdx.graphics.getHeight() / 2 + enemyOffset[i],
                     Gdx.graphics.getWidth() / 15, Gdx.graphics.getHeight() / 10);
-                batch.draw(enemyBirds[enemyFlapState], enemyX[i], Gdx.graphics.getHeight() / 2 + enemyOffset2[i],
+                batch.draw(currentEnemyBirds[enemyFlapState], enemyX[i], Gdx.graphics.getHeight() / 2 + enemyOffset2[i],
                     Gdx.graphics.getWidth() / 15, Gdx.graphics.getHeight() / 10);
-                batch.draw(enemyBirds[enemyFlapState], enemyX[i], Gdx.graphics.getHeight() / 2 + enemyOffset3[i],
+                batch.draw(currentEnemyBirds[enemyFlapState], enemyX[i], Gdx.graphics.getHeight() / 2 + enemyOffset3[i],
                     Gdx.graphics.getWidth() / 15, Gdx.graphics.getHeight() / 10);
 
                 enemyCircles[i] = new Circle(enemyX[i] + Gdx.graphics.getWidth() / 30, Gdx.graphics.getHeight() / 2 + enemyOffset[i] + Gdx.graphics.getHeight() / 20, Gdx.graphics.getWidth() / 40);
@@ -191,6 +220,7 @@ public class SurvivorBird extends ApplicationAdapter {
             }
         } else if (gameState == 2) {
             font2.draw(batch, "Game Over! Tap To Play Again!", 300, Gdx.graphics.getHeight() / 2);
+            font.draw(batch, "Record: " + highScore, 100, 350);
 
             if (Gdx.input.justTouched()) {
                 gameState = 1;
@@ -252,6 +282,9 @@ public class SurvivorBird extends ApplicationAdapter {
 
         enemyBirds[0].dispose();
         enemyBirds[1].dispose();
+
+        redEnemyBirds[0].dispose();
+        redEnemyBirds[1].dispose();
 
         font.dispose();
         font2.dispose();
