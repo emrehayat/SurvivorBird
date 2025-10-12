@@ -311,13 +311,22 @@ public class SurvivorBird extends ApplicationAdapter {
 
         birdCircle.set(birdX + (Gdx.graphics.getWidth() / 15) / 2, birdY + (Gdx.graphics.getHeight() / 10) /2, Gdx.graphics.getWidth() / 40);
 
+        //shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        //shapeRenderer.setColor(Color.BLACK);
+        //shapeRenderer.circle(birdCircle.x, birdCircle.y, birdCircle.radius);
+
         for (int i = 0; i < numberOfEnemies; i++) {
+            //shapeRenderer.circle(enemyX[i] + Gdx.graphics.getWidth() / 30, Gdx.graphics.getHeight() / 2 + enemyOffset[i] + Gdx.graphics.getHeight() / 20, Gdx.graphics.getWidth() / 40);
+            //shapeRenderer.circle(enemyX[i] + Gdx.graphics.getWidth() / 30, Gdx.graphics.getHeight() / 2 + enemyOffset2[i] + Gdx.graphics.getHeight() / 20, Gdx.graphics.getWidth() / 40);
+            //shapeRenderer.circle(enemyX[i] + Gdx.graphics.getWidth() / 30, Gdx.graphics.getHeight() / 2 + enemyOffset3[i] + Gdx.graphics.getHeight() / 20, Gdx.graphics.getWidth() / 40);
+
             if (Intersector.overlaps(birdCircle, enemyCircles[i]) ||
                 Intersector.overlaps(birdCircle, enemyCircles2[i]) ||
                 Intersector.overlaps(birdCircle, enemyCircles3[i])) {
                 gameState = 2;
             }
         }
+        //shapeRenderer.end();
     }
 
     @Override
